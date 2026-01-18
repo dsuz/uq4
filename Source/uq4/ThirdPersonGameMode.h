@@ -13,5 +13,5 @@ UCLASS()
 class UQ4_API AThirdPersonGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+	AThirdPersonGameMode();
 };
