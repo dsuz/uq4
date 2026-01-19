@@ -61,9 +61,30 @@ void AUQ4Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AUQ4Player::StopJumping);
 	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &AUQ4Player::StartAiming);
 	PlayerInputComponent->BindAction("Aim", IE_Released, this, &AUQ4Player::StopAiming);
+	PlayerInputComponent->BindAction("Shoot", IE_Pressed, this, &AUQ4Player::Shoot);
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 540.f, 0.f);
+}
+
+void AUQ4Player::Shoot()
+{
+	if (!bCanShoot) return;
+	bCanShoot = false;
+	// ここでモンタージュを再生する
+	if (ShootAnimMontage)
+		PlayAnimMontage(ShootAnimMontage);
+	// モンタージュを再生し終わったら
+	FTimerDelegate SetCanShootTrue =  FTimerDelegate::CreateWeakLambda(this,[this]()
+	{
+		bCanShoot = true;
+	});
+	GetWorldTimerManager().SetTimer(DelayTimerHandle, SetCanShootTrue, ShootInterval, false);
+}
+
+void AUQ4Player::ShootProjectile()
+{
+	UE_LOG(LogTemp, Log, TEXT("Shoot"));
 }
 
 void AUQ4Player::MoveFowardBackward(float AxisValue)
@@ -127,7 +148,7 @@ void AUQ4Player::ShowReticleWidget(bool bShow)
 	if (ReticleWidgetInstance)
 	{
 		ReticleWidgetInstance->SetVisibility(bShow ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
-	}
+	}	// 既にインスタンスがある場合は単純に表示/非表示を切り替える
 	else if (bShow)
 	{
 		if (ReticleWidgetClass)
@@ -138,5 +159,5 @@ void AUQ4Player::ShowReticleWidget(bool bShow)
 		{
 			ReticleWidgetInstance->AddToViewport();
 		}
-	}
+	}	// インスタンス化してない状態で呼ばれた場合は、それをする
 }
