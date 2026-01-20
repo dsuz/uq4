@@ -20,13 +20,13 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
-	USpringArmComponent* ThirdPersonCameraBoom;
+	TObjectPtr<USpringArmComponent> ThirdPersonCameraBoom;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
-	UCameraComponent* ThirdPersonCamera;
+	TObjectPtr<UCameraComponent> ThirdPersonCamera;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
-	USpringArmComponent* OverTheShoulderCameraBoom;
+	TObjectPtr<USpringArmComponent> OverTheShoulderCameraBoom;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
-	UCameraComponent* OverTheShoulderCamera;
+	TObjectPtr<UCameraComponent> OverTheShoulderCamera;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -38,10 +38,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=UI)
 	TSubclassOf<UUserWidget> ReticleWidgetClass;
 	UPROPERTY()
-	UUserWidget* ReticleWidgetInstance;
+	TObjectPtr<UUserWidget> ReticleWidgetInstance;
 	UPROPERTY(EditAnywhere)
-	UAnimMontage* ShootAnimMontage;
-	UPROPERTY(EditAnywhere)
+	TObjectPtr<UAnimMontage> ShootAnimMontage;
+	UPROPERTY(EditAnywhere)	// 連射制限
 	float ShootInterval = 0.1;
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -50,9 +50,17 @@ public:
 	// 発射のアニメーション通知を受けて呼ばれる
 	UFUNCTION(BlueprintCallable)
 	void ShootProjectile();
+	void ShootProjectileInFreeRunMode();
+	void ShootProjectileInAimMode();
 
 private:
 	FTimerHandle DelayTimerHandle;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UStaticMeshComponent> GunMeshComp;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UArrowComponent> Muzzle;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AActor> ProjectileClass;
 	bool bCanShoot = true;
 	void MoveFowardBackward(float AxisValue);
 	void MoveRightLeft(float AxisValue);
@@ -64,6 +72,8 @@ private:
 	void StartAiming();
 	// エイム→三人称視点
 	void StopAiming();
-	// 昇順の表示/非表示を切り替える
+	// エイムを切り替える
+	void SwitchAiming(EPlayerState NewState);
+	// 照準の表示/非表示を切り替える
 	void ShowReticleWidget(bool bShow);
 };
