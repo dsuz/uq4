@@ -50,8 +50,6 @@ public:
 	// 発射のアニメーション通知を受けて呼ばれる
 	UFUNCTION(BlueprintCallable)
 	void ShootProjectile();
-	void ShootProjectileInFreeRunMode();
-	void ShootProjectileInAimMode();
 
 private:
 	FTimerHandle DelayTimerHandle;

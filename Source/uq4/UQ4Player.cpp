@@ -7,6 +7,8 @@
 #include "Components/ArrowComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 AUQ4Player::AUQ4Player()
 {
@@ -36,7 +38,8 @@ AUQ4Player::AUQ4Player()
 	OverTheShoulderCamera->SetupAttachment(OverTheShoulderCameraBoom, USpringArmComponent::SocketName);
 	// Setup Gun
 	GunMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Gun"));
-	auto GunMesh = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("/Script/Engine.StaticMesh'/Game/UnrealQuest4_Game/Meshes/SM_WaterGun.SM_WaterGun'")).Object;
+	auto GunMesh = ConstructorHelpers::FObjectFinder<UStaticMesh>(
+		TEXT("/Script/Engine.StaticMesh'/Game/UnrealQuest4_Game/Meshes/SM_WaterGun.SM_WaterGun'")).Object;
 	auto SkeletalMeshComp = GetMesh();
 	GunMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	if (GunMesh && SkeletalMesh)
@@ -95,40 +98,44 @@ void AUQ4Player::Shoot()
 
 void AUQ4Player::ShootProjectile()
 {
+	// 不正な状態の時はログを出してアーリーリターンする
 	if (ProjectileClass.Get() == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("No Projectile Class"));
 		return;
 	}
-	
-	if (State == EPlayerState::FreeRun)
-		ShootProjectileInFreeRunMode();
-	if (State == EPlayerState::Aim)
-		ShootProjectileInAimMode();
-}
+	if (State != EPlayerState::FreeRun && State != EPlayerState::Aim)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Invalid player state"));
+		return;
+	}
 
-void AUQ4Player::ShootProjectileInFreeRunMode()
-{
-	auto Origin = GetActorLocation() + FVector(0, 0, 20); 
-	auto Target = Origin + 10000 * GetActorForwardVector();
+	auto Origin = GetActorLocation() + FVector(0, 0, 20); // FreeRun の時の値
+	auto Target = Origin + 10000 * GetActorForwardVector(); // FreeRun の時の値
+	auto ProjectileRotation = GetActorRotation(); // FreeRun で Ray が当たらなかった時の値
+	auto CameraManager = UGameplayStatics::GetPlayerController(this, 0)->PlayerCameraManager;
+
+	if (State == EPlayerState::Aim)
+	{
+		Origin = CameraManager->GetCameraLocation();
+		auto Direction = CameraManager->GetCameraRotation().Vector();
+		Target = Origin + Direction * 10000;
+	}
+
 	FHitResult Hit;
 	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, Origin, Target, ECollisionChannel::ECC_Visibility);
-	// DrawDebugLine(GetWorld(), Origin, Target, FColor::Red, false, 0.2f, 0, 1.0f);
-	
+
 	if (bHit)
 	{
-		auto Rotation = (Hit.Location - Muzzle->GetComponentLocation()).Rotation();
-		FActorSpawnParameters SpawnInfo;
-		GetWorld()->SpawnActor<AActor>(ProjectileClass.Get(), Muzzle->GetComponentLocation(), Rotation, SpawnInfo);
+		ProjectileRotation = (Hit.Location - Muzzle->GetComponentLocation()).Rotation();
 	}
-	else
+	else if (State == EPlayerState::Aim)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Ray no hit"));
-	}
-}
+		ProjectileRotation = CameraManager->GetCameraRotation();
+	}	// Aim モードで Ray が当たらなかったら、カメラが向いている方向に弾を飛ばす
 
-void AUQ4Player::ShootProjectileInAimMode()
-{
+	FActorSpawnParameters SpawnInfo;
+	GetWorld()->SpawnActor<AActor>(ProjectileClass.Get(), Muzzle->GetComponentLocation(), ProjectileRotation, SpawnInfo);
 }
 
 void AUQ4Player::MoveFowardBackward(float AxisValue)
@@ -159,6 +166,14 @@ void AUQ4Player::LookRightLeft(float AxisValue)
 
 void AUQ4Player::LimitAimAngle()
 {
+	if (State == EPlayerState::Aim)
+	{
+		auto PlayerController = this->GetController();
+		auto Rotation = PlayerController->GetControlRotation();
+		auto ClampedPitchAngle = UKismetMathLibrary::ClampAngle(Rotation.Pitch, AimLimitMin, AimLimitMax);
+		Rotation.Pitch = ClampedPitchAngle;
+		PlayerController->SetControlRotation(Rotation);
+	}
 }
 
 void AUQ4Player::StartAiming()
@@ -174,7 +189,7 @@ void AUQ4Player::StopAiming()
 void AUQ4Player::SwitchAiming(EPlayerState NewState)
 {
 	State = NewState;
-	
+
 	switch (NewState)
 	{
 	case EPlayerState::Aim:
