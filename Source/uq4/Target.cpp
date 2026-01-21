@@ -21,7 +21,7 @@ ATarget::ATarget()
 void ATarget::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString::Printf(TEXT("Target is overlaped by: %s"), *OtherActor->GetName()));
+	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString::Printf(TEXT("Target is overlaped by: %s"), *OtherActor->GetName()));
 	
 	if (OtherActor->ActorHasTag(TEXT("Bullet")))
 	{
