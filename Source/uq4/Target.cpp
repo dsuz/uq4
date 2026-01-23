@@ -2,11 +2,18 @@
 
 
 #include "Target.h"
+
+#include "SAdvancedRotationInputBox.h"
+#include "GameFramework/MovementComponent.h"
 #include "Sound/SoundCue.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Materials/MaterialIREmitter.h"
+#include "PhysicsEngine/PhysicsSettings.h"
 
 ATarget::ATarget()
 {
+	PrimaryActorTick.bCanEverTick = true;
 	auto ObjectFinder = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("/Script/Engine.StaticMesh'/Game/UnrealQuest4_Game/Meshes/SM_Target.SM_Target'"));
 	if (ObjectFinder.Succeeded())
 	{
@@ -16,6 +23,24 @@ ATarget::ATarget()
 	auto SMeshComp = GetStaticMeshComponent();
 	SMeshComp->SetStaticMesh(TargetMesh);
 	SMeshComp->SetGenerateOverlapEvents(true);
+}
+
+void ATarget::BeginPlay()
+{
+	Super::BeginPlay();
+	OriginalLocation = GetActorLocation();
+}
+
+void ATarget::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	float X = XAmplitude * UKismetMathLibrary::Sin(XVelocity * Timer);
+	float Y = YAmplitude * UKismetMathLibrary::Cos(YVelocity * Timer);
+	float Z = ZAmplitude * UKismetMathLibrary::Sin(ZVelocity * Timer);
+	SetActorLocation(FVector(X, Y, Z) + OriginalLocation);
+	Timer += DeltaSeconds;
+	if (Timer >= UKismetMathLibrary::GetPI() * 2)
+		Timer = 0.f;
 }
 
 void ATarget::NotifyActorBeginOverlap(AActor* OtherActor)
