@@ -3,13 +3,9 @@
 
 #include "Target.h"
 
-#include "SAdvancedRotationInputBox.h"
-#include "GameFramework/MovementComponent.h"
 #include "Sound/SoundCue.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "Materials/MaterialIREmitter.h"
-#include "PhysicsEngine/PhysicsSettings.h"
 
 ATarget::ATarget()
 {
