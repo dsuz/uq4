@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Enums.h"
 #include "Components/BoxComponent.h"
 #include "Engine/StaticMeshActor.h"
 #include "Gate.generated.h"
@@ -14,6 +15,8 @@ public:
 	AGate();
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UBoxComponent> GoalTrigger;
+	UPROPERTY(EditAnywhere)
+	TEnumAsByte<EGateType> GateType  = EGateType::Start;
 
 protected:
 	virtual void PostInitializeComponents() override;

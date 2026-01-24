@@ -1,5 +1,7 @@
 #include "Gate.h"
 
+#include "ThirdPersonGameMode.h"
+
 AGate::AGate()
 {
 	GoalTrigger = CreateDefaultSubobject<UBoxComponent>("GoalTrigger");
@@ -9,7 +11,7 @@ AGate::AGate()
 void AGate::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	
+
 	if (GoalTrigger)
 	{
 		GoalTrigger->OnComponentBeginOverlap.AddDynamic(this, &AGate::OnOverlapBegin);
@@ -22,7 +24,28 @@ void AGate::PostInitializeComponents()
 }
 
 void AGate::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                           int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Emerald, TEXT("Goal."));
+	auto GameModeBase = GetWorld()->GetAuthGameMode();
+	auto GameMode = Cast<AThirdPersonGameMode>(GameModeBase);
+	if (!GameMode)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Game Mode is null"));
+		return;
+	}
+	
+	switch (GateType)
+	{
+	case EGateType::Start:
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Emerald, TEXT("Start."));
+		GameMode->StartTimer();
+		break;
+	case EGateType::Goal:
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Emerald, TEXT("Goal."));
+		GameMode->StopTimer();
+		break;
+	default:
+		break;
+	}
+
 }

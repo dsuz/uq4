@@ -6,3 +6,11 @@ enum EPlayerState
 	FreeRun,
 	Aim,
 };
+
+UENUM(BlueprintType)
+enum EGateType
+{
+	Start,
+	CheckPoint,
+	Goal,
+};
