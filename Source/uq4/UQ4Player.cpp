@@ -61,6 +61,15 @@ void AUQ4Player::BeginPlay()
 	Super::BeginPlay();
 }
 
+float AUQ4Player::TakeDamage(float Damage, const FDamageEvent& DamageEvent, AController* EventInstigator,
+	AActor* DamageCauser)
+{
+	Life -= Damage;
+	if (Life <= 0.f)
+		Die();
+	return Life;
+}
+
 void AUQ4Player::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -136,6 +145,11 @@ void AUQ4Player::ShootProjectile()
 
 	FActorSpawnParameters SpawnInfo;
 	GetWorld()->SpawnActor<AActor>(ProjectileClass.Get(), Muzzle->GetComponentLocation(), ProjectileRotation, SpawnInfo);
+}
+
+void AUQ4Player::Die()
+{
+	ActivateRagdoll();
 }
 
 void AUQ4Player::MoveFowardBackward(float AxisValue)
@@ -227,4 +241,37 @@ void AUQ4Player::ShowReticleWidget(bool bShow)
 			ReticleWidgetInstance->AddToViewport();
 		}
 	} // インスタンス化してない状態で呼ばれた場合は、それをする
+}
+
+void AUQ4Player::ActivateRagdoll()
+{
+	if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
+	{
+		MoveComp->DisableMovement();
+	}
+ 
+	// Disable player input
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		DisableInput(PC);
+	}
+ 
+	// Detach controller (optional)
+	DetachFromControllerPendingDestroy();
+ 
+	// Set collision profile for ragdoll
+	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+ 
+	// Enable physics simulation on all bones
+	GetMesh()->SetAllBodiesSimulatePhysics(true);
+	GetMesh()->WakeAllRigidBodies();
+	GetMesh()->bBlendPhysics = true;
+ 
+	// Optional: stop animation
+	GetMesh()->SetAnimation(nullptr);
+ 
+	// Detach Gun
+	GunMeshComp->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+	GunMeshComp->SetSimulatePhysics(true);
+	//GetMesh()->SetCollisionProfileName(TEXT("PhysicsActor"));
 }

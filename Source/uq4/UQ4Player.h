@@ -23,6 +23,12 @@ protected:
 	TObjectPtr<USpringArmComponent> ThirdPersonCameraBoom;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	TObjectPtr<UCameraComponent> ThirdPersonCamera;
+
+public:
+	virtual float TakeDamage(float Damage, const FDamageEvent& DamageEvent, AController* EventInstigator,
+		AActor* DamageCauser) override;
+
+protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	TObjectPtr<USpringArmComponent> OverTheShoulderCameraBoom;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
@@ -41,7 +47,7 @@ public:
 	TObjectPtr<UUserWidget> ReticleWidgetInstance;
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UAnimMontage> ShootAnimMontage;
-	UPROPERTY(EditAnywhere)	// 連射制限
+	UPROPERTY(EditAnywhere) // 連射制限
 	float ShootInterval = 0.1;
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -50,6 +56,8 @@ public:
 	// 発射のアニメーション通知を受けて呼ばれる
 	UFUNCTION(BlueprintCallable)
 	void ShootProjectile();
+	UFUNCTION(BlueprintCallable)
+	void Die();
 
 private:
 	FTimerHandle DelayTimerHandle;
@@ -59,6 +67,10 @@ private:
 	TObjectPtr<UArrowComponent> Muzzle;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AActor> ProjectileClass;
+	UPROPERTY(EditAnywhere)
+	float MaxLife = 100;
+	UPROPERTY()
+	float Life = MaxLife;
 	bool bCanShoot = true;
 	void MoveFowardBackward(float AxisValue);
 	void MoveRightLeft(float AxisValue);
@@ -74,4 +86,5 @@ private:
 	void SwitchAiming(EPlayerState NewState);
 	// 照準の表示/非表示を切り替える
 	void ShowReticleWidget(bool bShow);
+	void ActivateRagdoll();
 };
