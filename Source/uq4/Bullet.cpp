@@ -14,7 +14,8 @@ ABullet::ABullet()
 	Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	StaticMesh->SetCollisionProfileName(TEXT("NoCollision"));
-	Collision->SetupAttachment(GetRootComponent());
+	//Collision->SetupAttachment(GetRootComponent());
+	RootComponent = Collision;
 	StaticMesh->SetupAttachment(Collision);
 	Tags.Add("Bullet");
 }

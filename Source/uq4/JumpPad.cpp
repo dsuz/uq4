@@ -7,7 +7,7 @@ AJumpPad::AJumpPad()
 {
 	Frame = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");
 	Pad = CreateDefaultSubobject<UStaticMeshComponent>("Pad");
-	Frame->SetupAttachment(RootComponent);
+	RootComponent = Frame;
 	Pad->SetupAttachment(Frame);
 	BouncePadTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Bounce Timeline"));
 	BouncePadTimeline->SetLooping(false);
