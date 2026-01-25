@@ -1,14 +1,10 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Door.h"
 #include "Engine/StaticMeshActor.h"
 #include "Target.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class UQ4_API ATarget : public AStaticMeshActor
 {
@@ -42,6 +38,9 @@ public:
 	float YVelocity;
 	UPROPERTY(EditAnywhere)
 	float ZVelocity;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<ADoor> TargetDoor;
+	virtual void Destroyed() override;
 
 private:
 	FVector OriginalLocation;

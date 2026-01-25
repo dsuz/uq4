@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Target.h"
 
 #include "Sound/SoundCue.h"
@@ -57,4 +54,11 @@ void ATarget::NotifyActorBeginOverlap(AActor* OtherActor)
 		}
 		this->Destroy();
 	}
+}
+
+void ATarget::Destroyed()
+{
+	Super::Destroyed();
+	if (TargetDoor)
+		TargetDoor->Open();
 }
