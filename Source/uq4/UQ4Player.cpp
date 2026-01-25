@@ -73,6 +73,11 @@ float AUQ4Player::TakeDamage(float Damage, const FDamageEvent& DamageEvent, ACon
 void AUQ4Player::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	if (bForceMoveForward)
+	{
+		AddMovementInput(GetActorForwardVector(), SlidingSpeed * DeltaTime, true);
+	}
 }
 
 void AUQ4Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -87,6 +92,7 @@ void AUQ4Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &AUQ4Player::StartAiming);
 	PlayerInputComponent->BindAction("Aim", IE_Released, this, &AUQ4Player::StopAiming);
 	PlayerInputComponent->BindAction("Shoot", IE_Pressed, this, &AUQ4Player::Shoot);
+	PlayerInputComponent->BindAction("Sliding", IE_Pressed, this, &AUQ4Player::StartSliding);
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 540.f, 0.f);
@@ -103,6 +109,36 @@ void AUQ4Player::Shoot()
 	GetWorldTimerManager().SetTimer(DelayTimerHandle,
 	                                FTimerDelegate::CreateWeakLambda(this, [this]() { bCanShoot = true; }),
 	                                ShootInterval, false);
+}
+
+void AUQ4Player::StartSliding()
+{
+	if (GetCharacterMovement()->MaxWalkSpeed == SlidingSpeed) return;	// スライディングしている間はこの操作を無効にする
+	// スライディングしている間は制御不能にする
+	bForceMoveForward = true;
+	auto OriginalWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = SlidingSpeed;
+	TObjectPtr<APlayerController> PlayerController = Cast<APlayerController>(GetController());
+	//if (PlayerController)
+		//DisableInput(PlayerController);	// スライディングしている間も少し制御できた方が面白いので、制御を無効にしない
+	auto AnimInstance = GetMesh()->GetAnimInstance();
+	
+	if (SlidingAnimMontage && AnimInstance)
+	{
+		AnimInstance->Montage_Play(SlidingAnimMontage);
+		// Anim Montage の再生が終了した時の処理はラムダ式の匿名関数を作ってバインドする
+		auto MontageEndDelegate = AnimInstance->Montage_GetEndedDelegate(SlidingAnimMontage);
+		MontageEndDelegate->BindWeakLambda(this, [this, PlayerController, OriginalWalkSpeed](UAnimMontage* FRepRootMotionMontage, bool bInterrupted)
+		{
+			bForceMoveForward = false;
+			GetCharacterMovement()->MaxWalkSpeed = OriginalWalkSpeed;
+			//EnableInput(PlayerController);
+		});
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No Sliding Anim Montage or Invalid Animation Settings"));
+	}
 }
 
 void AUQ4Player::ShootProjectile()

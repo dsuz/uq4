@@ -47,12 +47,16 @@ public:
 	TObjectPtr<UUserWidget> ReticleWidgetInstance;
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UAnimMontage> ShootAnimMontage;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UAnimMontage> SlidingAnimMontage;
 	UPROPERTY(EditAnywhere) // 連射制限
 	float ShootInterval = 0.1;
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// 発射のキー操作をした時に呼ぶ
 	void Shoot();
+	// スライディングのキー操作をした時に呼ぶ
+	void StartSliding();
 	// 発射のアニメーション通知を受けて呼ばれる
 	UFUNCTION(BlueprintCallable)
 	void ShootProjectile();
@@ -71,7 +75,10 @@ private:
 	float MaxLife = 100;
 	UPROPERTY()
 	float Life = MaxLife;
+	UPROPERTY(EditAnywhere)
+	float SlidingSpeed = 100;
 	bool bCanShoot = true;
+	bool bForceMoveForward = false;
 	void MoveFowardBackward(float AxisValue);
 	void MoveRightLeft(float AxisValue);
 	void LookUpDown(float AxisValue);
