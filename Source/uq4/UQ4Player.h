@@ -7,6 +7,9 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "InputActionValue.h"
 #include "UQ4Player.generated.h"
 
 UCLASS()
@@ -19,6 +22,18 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	// Input Mapping Context
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input)
+	TObjectPtr<UInputMappingContext> DefaultMappingContext;
+	// Move Input Actions
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	TObjectPtr<UInputAction> MoveAction;
+	// Jump Input Actions
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	TObjectPtr<UInputAction> JumpAction;
+	// Move Character function
+	UFUNCTION(BlueprintCallable)
+	void Move(const FInputActionValue& Value);
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	TObjectPtr<USpringArmComponent> ThirdPersonCameraBoom;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
