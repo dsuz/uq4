@@ -14,3 +14,11 @@ enum EGateType
 	CheckPoint,
 	Goal,
 };
+
+UENUM(BlueprintType)
+enum EGameState
+{
+	None,
+	InGame,
+	Completed,
+};

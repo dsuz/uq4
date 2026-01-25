@@ -14,14 +14,24 @@ void AThirdPersonGameMode::Tick(float DeltaSeconds)
 		ElapsedTime += DeltaSeconds;
 }
 
-void AThirdPersonGameMode::StartTimer()
+void AThirdPersonGameMode::StartGame()
 {
-	bIsTimerRunning = true;
+	if (GameState == EGameState::None)
+	{
+		bIsTimerRunning = true;
+		GameState = EGameState::InGame;
+		OnGameStart.Broadcast();
+	}
 }
 
-void AThirdPersonGameMode::StopTimer()
+void AThirdPersonGameMode::StopGame()
 {
-	bIsTimerRunning = false;
+	if (GameState == EGameState::InGame)
+	{
+		bIsTimerRunning = false;
+		GameState = EGameState::Completed;
+		OnGameFinished.Broadcast();
+	}
 }
 
 void AThirdPersonGameMode::ResetTimer()
@@ -33,5 +43,10 @@ void AThirdPersonGameMode::ResetTimer()
 float AThirdPersonGameMode::GetElapsedSeconds()
 {
 	return ElapsedTime;
+}
+
+EGameState AThirdPersonGameMode::GetGameState()
+{
+	return GameState;
 }
 

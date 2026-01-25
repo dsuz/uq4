@@ -26,6 +26,7 @@ void AGate::PostInitializeComponents()
 void AGate::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                            int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	// 設定に応じて、ゲームを開始/終了する
 	auto GameModeBase = GetWorld()->GetAuthGameMode();
 	auto GameMode = Cast<AThirdPersonGameMode>(GameModeBase);
 	if (!GameMode)
@@ -37,12 +38,10 @@ void AGate::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAct
 	switch (GateType)
 	{
 	case EGateType::Start:
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Emerald, TEXT("Start."));
-		GameMode->StartTimer();
+		GameMode->StartGame();
 		break;
 	case EGateType::Goal:
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Emerald, TEXT("Goal."));
-		GameMode->StopTimer();
+		GameMode->StopGame();
 		break;
 	default:
 		break;
