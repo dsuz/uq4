@@ -77,6 +77,12 @@ public:
 	void ShootProjectile();
 	UFUNCTION(BlueprintCallable)
 	void Die();
+	// 三人称視点→エイム
+	UFUNCTION(BlueprintCallable)
+	void StartAiming();
+	// エイム→三人称視点
+	UFUNCTION(BlueprintCallable)
+	void StopAiming();
 
 private:
 	FTimerHandle DelayTimerHandle;
@@ -100,10 +106,6 @@ private:
 	void LookRightLeft(float AxisValue);
 	// エイム時の視点操作を制限する
 	void LimitAimAngle();
-	// 三人称視点→エイム
-	void StartAiming();
-	// エイム→三人称視点
-	void StopAiming();
 	// エイムを切り替える
 	void SwitchAiming(EPlayerState NewState);
 	// 照準の表示/非表示を切り替える
