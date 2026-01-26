@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -7,9 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "InputActionValue.h"
 #include "UQ4Player.generated.h"
 
 UCLASS()
@@ -25,15 +21,9 @@ protected:
 	// Input Mapping Context
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input)
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;
-	// Move Input Actions
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
-	TObjectPtr<UInputAction> MoveAction;
-	// Jump Input Actions
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
-	TObjectPtr<UInputAction> JumpAction;
 	// Move Character function
 	UFUNCTION(BlueprintCallable)
-	void Move(const FInputActionValue& Value);
+	void Move(const FVector2D Value);
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	TObjectPtr<USpringArmComponent> ThirdPersonCameraBoom;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
@@ -69,8 +59,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// 発射のキー操作をした時に呼ぶ
+	UFUNCTION(BlueprintCallable)
 	void Shoot();
 	// スライディングのキー操作をした時に呼ぶ
+	UFUNCTION(BlueprintCallable)
 	void StartSliding();
 	// 発射のアニメーション通知を受けて呼ばれる
 	UFUNCTION(BlueprintCallable)
@@ -100,10 +92,8 @@ private:
 	float SlidingSpeed = 100;
 	bool bCanShoot = true;
 	bool bForceMoveForward = false;
-	void MoveFowardBackward(float AxisValue);
-	void MoveRightLeft(float AxisValue);
-	void LookUpDown(float AxisValue);
-	void LookRightLeft(float AxisValue);
+	UFUNCTION(BlueprintCallable)
+	void Look(const FVector2D Value);
 	// エイム時の視点操作を制限する
 	void LimitAimAngle();
 	// エイムを切り替える

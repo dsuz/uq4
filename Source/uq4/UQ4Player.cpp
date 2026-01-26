@@ -1,8 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "UQ4Player.h"
-
 #include "Blueprint/UserWidget.h"
 #include "Components/ArrowComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -94,61 +90,21 @@ void AUQ4Player::Tick(float DeltaTime)
 void AUQ4Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	
-	if (UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent))
-	{
-		if (MoveAction)
-		{
-			EnhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AUQ4Player::Move);
-		}
- 
-		if (JumpAction)
-		{
-			EnhancedInput->BindAction(JumpAction, ETriggerEvent::Started, this, &AUQ4Player::Jump);
-			EnhancedInput->BindAction(JumpAction, ETriggerEvent::Completed, this, &AUQ4Player::StopJumping);
-		}
-	}
-	
-	// PlayerInputComponent->BindAxis("Move Forward / Backward", this, &AUQ4Player::MoveFowardBackward);
-	// PlayerInputComponent->BindAxis("Move Right / Left", this, &AUQ4Player::MoveRightLeft);
-	PlayerInputComponent->BindAxis("Turn Right / Left Mouse", this, &AUQ4Player::LookRightLeft);
-	PlayerInputComponent->BindAxis("Look Up / Down Mouse", this, &AUQ4Player::LookUpDown);
-	// PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AUQ4Player::Jump);
-	// PlayerInputComponent->BindAction("Jump", IE_Released, this, &AUQ4Player::StopJumping);
-	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &AUQ4Player::StartAiming);
-	PlayerInputComponent->BindAction("Aim", IE_Released, this, &AUQ4Player::StopAiming);
-	PlayerInputComponent->BindAction("Shoot", IE_Pressed, this, &AUQ4Player::Shoot);
-	PlayerInputComponent->BindAction("Sliding", IE_Pressed, this, &AUQ4Player::StartSliding);
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 540.f, 0.f);
 }
 
-void AUQ4Player::Move(const FInputActionValue& Value)
+void AUQ4Player::Move(const FVector2D Value)
 {
-	FVector2D MovementVector = Value.Get<FVector2D>();
-	if (MovementVector.IsNearlyZero())
+	if (Value.IsNearlyZero())
 	{
 		return;
 	}
 	const FRotator YawRotation(0, Controller->GetControlRotation().Yaw, 0);
 	const FRotationMatrix RotationMatrix(YawRotation);
-	AddMovementInput(RotationMatrix.GetUnitAxis(EAxis::X), MovementVector.Y);
-	AddMovementInput(RotationMatrix.GetUnitAxis(EAxis::Y), MovementVector.X);
-}
-
-void AUQ4Player::MoveFowardBackward(float AxisValue)	// 不要
-{
-	const FRotator YawRotation(0, Controller->GetControlRotation().Yaw, 0);
-	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	AddMovementInput(ForwardDirection, AxisValue);
-}
-
-void AUQ4Player::MoveRightLeft(float AxisValue)	// 不要
-{
-	const FRotator YawRotation(0, Controller->GetControlRotation().Yaw, 0);
-	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-	AddMovementInput(RightDirection, AxisValue);
+	AddMovementInput(RotationMatrix.GetUnitAxis(EAxis::X), Value.Y);
+	AddMovementInput(RotationMatrix.GetUnitAxis(EAxis::Y), Value.X);
 }
 
 void AUQ4Player::Shoot()
@@ -221,9 +177,8 @@ void AUQ4Player::ShootProjectile()
 	}
 
 	FHitResult Hit;
-	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, Origin, Target, ECollisionChannel::ECC_Visibility);
 
-	if (bHit)
+	if (bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, Origin, Target, ECollisionChannel::ECC_Visibility))
 	{
 		ProjectileRotation = (Hit.Location - Muzzle->GetComponentLocation()).Rotation();
 	}
@@ -241,15 +196,10 @@ void AUQ4Player::Die()
 	ActivateRagdoll();
 }
 
-void AUQ4Player::LookUpDown(float AxisValue)
+void AUQ4Player::Look(const FVector2D Value)
 {
-	AddControllerPitchInput(AxisValue);
-	LimitAimAngle();
-}
-
-void AUQ4Player::LookRightLeft(float AxisValue)
-{
-	AddControllerYawInput(AxisValue);
+	AddControllerPitchInput(Value.Y);
+	AddControllerYawInput(Value.X);
 	LimitAimAngle();
 }
 
