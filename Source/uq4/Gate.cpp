@@ -15,7 +15,6 @@ void AGate::PostInitializeComponents()
 	if (GoalTrigger)
 	{
 		GoalTrigger->OnComponentBeginOverlap.AddDynamic(this, &AGate::OnOverlapBegin);
-		UE_LOG(LogTemp, Warning, TEXT("Bound overlap event in BeginPlay"));
 	}
 	else
 	{
@@ -26,6 +25,11 @@ void AGate::PostInitializeComponents()
 void AGate::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                            int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	// Overlap したのがプレイヤーの時のみ処理する
+	auto Player = Cast<APawn>(OtherActor);
+	if (!Player)
+		return;
+	
 	// 設定に応じて、ゲームを開始/終了する
 	auto GameModeBase = GetWorld()->GetAuthGameMode();
 	auto GameMode = Cast<AThirdPersonGameMode>(GameModeBase);
