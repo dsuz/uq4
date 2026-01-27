@@ -24,20 +24,20 @@ protected:
 	// Move Character function
 	UFUNCTION(BlueprintCallable)
 	void Move(const FVector2D Value);
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
-	TObjectPtr<USpringArmComponent> ThirdPersonCameraBoom;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
-	TObjectPtr<UCameraComponent> ThirdPersonCamera;
+	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
+	// TObjectPtr<USpringArmComponent> ThirdPersonCameraBoom;
+	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
+	// TObjectPtr<UCameraComponent> ThirdPersonCamera;
 
 public:
 	virtual float TakeDamage(float Damage, const FDamageEvent& DamageEvent, AController* EventInstigator,
 		AActor* DamageCauser) override;
 
-protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
-	TObjectPtr<USpringArmComponent> OverTheShoulderCameraBoom;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
-	TObjectPtr<UCameraComponent> OverTheShoulderCamera;
+// protected:
+// 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
+// 	TObjectPtr<USpringArmComponent> OverTheShoulderCameraBoom;
+// 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
+// 	TObjectPtr<UCameraComponent> OverTheShoulderCamera;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -101,5 +101,5 @@ private:
 	// 照準の表示/非表示を切り替える
 	void ShowReticleWidget(bool bShow);
 	void ActivateRagdoll();
-	void SetupCamera();
+	//void SetupCamera();
 };

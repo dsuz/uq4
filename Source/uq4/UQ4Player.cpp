@@ -292,20 +292,20 @@ void AUQ4Player::ActivateRagdoll()
 	//GetMesh()->SetCollisionProfileName(TEXT("PhysicsActor"));
 }
 
-void AUQ4Player::SetupCamera()
-{
-	// Add SpringArm Component and Camera for third person view
-	ThirdPersonCameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("ThirdPersonCameraBoom"));
-	ThirdPersonCameraBoom->SetupAttachment(GetCapsuleComponent());
-	ThirdPersonCameraBoom->bUsePawnControlRotation = true;
-	ThirdPersonCameraBoom->TargetArmLength = 400.f;
-	ThirdPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ThirdPersonCamera"));
-	ThirdPersonCamera->SetupAttachment(ThirdPersonCameraBoom, USpringArmComponent::SocketName);
-	// Add SpringArm Component and Camera for over-the-shoulder view
-	OverTheShoulderCameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("OverTheShoulderCameraBoom"));
-	OverTheShoulderCameraBoom->SetupAttachment(GetCapsuleComponent());
-	OverTheShoulderCameraBoom->bUsePawnControlRotation = true;
-	OverTheShoulderCameraBoom->TargetArmLength = 100.f;
-	OverTheShoulderCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("OverTheShoulderCamera"));
-	OverTheShoulderCamera->SetupAttachment(OverTheShoulderCameraBoom, USpringArmComponent::SocketName);
-}
+// void AUQ4Player::SetupCamera()
+// {
+// 	// Add SpringArm Component and Camera for third person view
+// 	ThirdPersonCameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("ThirdPersonCameraBoom"));
+// 	ThirdPersonCameraBoom->SetupAttachment(GetCapsuleComponent());
+// 	ThirdPersonCameraBoom->bUsePawnControlRotation = true;
+// 	ThirdPersonCameraBoom->TargetArmLength = 400.f;
+// 	ThirdPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ThirdPersonCamera"));
+// 	ThirdPersonCamera->SetupAttachment(ThirdPersonCameraBoom, USpringArmComponent::SocketName);
+// 	// Add SpringArm Component and Camera for over-the-shoulder view
+// 	OverTheShoulderCameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("OverTheShoulderCameraBoom"));
+// 	OverTheShoulderCameraBoom->SetupAttachment(GetCapsuleComponent());
+// 	OverTheShoulderCameraBoom->bUsePawnControlRotation = true;
+// 	OverTheShoulderCameraBoom->TargetArmLength = 100.f;
+// 	OverTheShoulderCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("OverTheShoulderCamera"));
+// 	OverTheShoulderCamera->SetupAttachment(OverTheShoulderCameraBoom, USpringArmComponent::SocketName);
+// }
