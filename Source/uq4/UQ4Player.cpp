@@ -21,7 +21,7 @@ AUQ4Player::AUQ4Player()
 	}
 	
 	// Camera setup
-	SetupCamera();
+	//SetupCamera();
 	
 	// Setup Gun
 	GunMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Gun"));
@@ -223,15 +223,15 @@ void AUQ4Player::SwitchAiming(EPlayerState NewState)
 	switch (NewState)
 	{
 	case EPlayerState::Aim:
-		ThirdPersonCamera->Deactivate();
-		OverTheShoulderCamera->Activate();
+		// ThirdPersonCamera->Deactivate();
+		// OverTheShoulderCamera->Activate();
 		bUseControllerRotationYaw = true;
 		GetCharacterMovement()->bOrientRotationToMovement = false;
 		ShowReticleWidget(true);
 		break;
 	case EPlayerState::FreeRun:
-		ThirdPersonCamera->Activate();
-		OverTheShoulderCamera->Deactivate();
+		// ThirdPersonCamera->Activate();
+		// OverTheShoulderCamera->Deactivate();
 		bUseControllerRotationYaw = false;
 		GetCharacterMovement()->bOrientRotationToMovement = true;
 		ShowReticleWidget(false);
@@ -308,5 +308,4 @@ void AUQ4Player::SetupCamera()
 	OverTheShoulderCameraBoom->TargetArmLength = 100.f;
 	OverTheShoulderCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("OverTheShoulderCamera"));
 	OverTheShoulderCamera->SetupAttachment(OverTheShoulderCameraBoom, USpringArmComponent::SocketName);
-
 }
