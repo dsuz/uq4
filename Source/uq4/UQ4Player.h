@@ -101,4 +101,5 @@ private:
 	// 照準の表示/非表示を切り替える
 	void ShowReticleWidget(bool bShow);
 	void ActivateRagdoll();
+	void SetupCamera();
 };
