@@ -1,7 +1,7 @@
 #include "UQ4Player.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/ArrowComponent.h"
-#include "Components/CapsuleComponent.h"
+//#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -19,9 +19,6 @@ AUQ4Player::AUQ4Player()
 		GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -85.f));
 		GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 	}
-	
-	// Camera setup
-	//SetupCamera();
 	
 	// Setup Gun
 	GunMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Gun"));
@@ -41,6 +38,11 @@ AUQ4Player::AUQ4Player()
 			Muzzle->SetRelativeRotation(FRotator(0, 90, 0));
 		}
 	}
+	
+	// Camera setup
+	//SetupCamera();
+	GameplayCameraComponent = CreateDefaultSubobject<UGameplayCameraComponent>("Camera");
+	GameplayCameraComponent->SetupAttachment(RootComponent);
 }
 
 void AUQ4Player::BeginPlay()

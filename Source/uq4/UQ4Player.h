@@ -2,10 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "Enums.h"
-#include "Camera/CameraComponent.h"
+//#include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
-#include "GameFramework/SpringArmComponent.h"
+//#include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "GameFramework/GameplayCameraComponent.h"
 #include "UQ4Player.generated.h"
 
 UCLASS()
@@ -56,6 +57,8 @@ public:
 	TObjectPtr<UAnimMontage> SlidingAnimMontage;
 	UPROPERTY(EditAnywhere) // 連射制限
 	float ShootInterval = 0.1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UGameplayCameraComponent> GameplayCameraComponent;
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// 発射のキー操作をした時に呼ぶ
