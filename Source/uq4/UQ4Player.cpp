@@ -279,9 +279,6 @@ void AUQ4Player::ActivateRagdoll()
 	GetMesh()->WakeAllRigidBodies();
 	GetMesh()->bBlendPhysics = true;
  
-	// Optional: stop animation
-	GetMesh()->SetAnimation(nullptr);
- 
 	// Detach Gun
 	GunMeshComp->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 	GunMeshComp->SetSimulatePhysics(true);
