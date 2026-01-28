@@ -2,10 +2,9 @@
 
 #include "CoreMinimal.h"
 #include "Enums.h"
-#include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
-#include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "GameFramework/GameplayCameraComponent.h"
 #include "UQ4Player.generated.h"
 
 UCLASS()
@@ -24,20 +23,10 @@ protected:
 	// Move Character function
 	UFUNCTION(BlueprintCallable)
 	void Move(const FVector2D Value);
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
-	TObjectPtr<USpringArmComponent> ThirdPersonCameraBoom;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
-	TObjectPtr<UCameraComponent> ThirdPersonCamera;
 
 public:
 	virtual float TakeDamage(float Damage, const FDamageEvent& DamageEvent, AController* EventInstigator,
 		AActor* DamageCauser) override;
-
-protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
-	TObjectPtr<USpringArmComponent> OverTheShoulderCameraBoom;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
-	TObjectPtr<UCameraComponent> OverTheShoulderCamera;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -56,6 +45,8 @@ public:
 	TObjectPtr<UAnimMontage> SlidingAnimMontage;
 	UPROPERTY(EditAnywhere) // 連射制限
 	float ShootInterval = 0.1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UGameplayCameraComponent> GameplayCameraComponent;
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// 発射のキー操作をした時に呼ぶ

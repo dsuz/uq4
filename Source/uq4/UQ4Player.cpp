@@ -1,7 +1,6 @@
 #include "UQ4Player.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/ArrowComponent.h"
-#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -9,6 +8,7 @@
 AUQ4Player::AUQ4Player()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	
 	// Set skeletal mesh
 	auto SkeletalMesh = ConstructorHelpers::FObjectFinder<USkeletalMesh>(
 		TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequin_UE4/Meshes/SK_Mannequin.SK_Mannequin'")).Object;
@@ -18,20 +18,7 @@ AUQ4Player::AUQ4Player()
 		GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -85.f));
 		GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 	}
-	// Add SpringArm Component and Camera for third person view
-	ThirdPersonCameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("ThirdPersonCameraBoom"));
-	ThirdPersonCameraBoom->SetupAttachment(GetCapsuleComponent());
-	ThirdPersonCameraBoom->bUsePawnControlRotation = true;
-	ThirdPersonCameraBoom->TargetArmLength = 400.f;
-	ThirdPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ThirdPersonCamera"));
-	ThirdPersonCamera->SetupAttachment(ThirdPersonCameraBoom, USpringArmComponent::SocketName);
-	// Add SpringArm Component and Camera for over-the-shoulder view
-	OverTheShoulderCameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("OverTheShoulderCameraBoom"));
-	OverTheShoulderCameraBoom->SetupAttachment(GetCapsuleComponent());
-	OverTheShoulderCameraBoom->bUsePawnControlRotation = true;
-	OverTheShoulderCameraBoom->TargetArmLength = 100.f;
-	OverTheShoulderCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("OverTheShoulderCamera"));
-	OverTheShoulderCamera->SetupAttachment(OverTheShoulderCameraBoom, USpringArmComponent::SocketName);
+	
 	// Setup Gun
 	GunMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Gun"));
 	auto GunMesh = ConstructorHelpers::FObjectFinder<UStaticMesh>(
@@ -50,6 +37,10 @@ AUQ4Player::AUQ4Player()
 			Muzzle->SetRelativeRotation(FRotator(0, 90, 0));
 		}
 	}
+	
+	// Camera setup
+	GameplayCameraComponent = CreateDefaultSubobject<UGameplayCameraComponent>("Camera");
+	GameplayCameraComponent->SetupAttachment(RootComponent);
 }
 
 void AUQ4Player::BeginPlay()
@@ -232,15 +223,11 @@ void AUQ4Player::SwitchAiming(EPlayerState NewState)
 	switch (NewState)
 	{
 	case EPlayerState::Aim:
-		ThirdPersonCamera->Deactivate();
-		OverTheShoulderCamera->Activate();
 		bUseControllerRotationYaw = true;
 		GetCharacterMovement()->bOrientRotationToMovement = false;
 		ShowReticleWidget(true);
 		break;
 	case EPlayerState::FreeRun:
-		ThirdPersonCamera->Activate();
-		OverTheShoulderCamera->Deactivate();
 		bUseControllerRotationYaw = false;
 		GetCharacterMovement()->bOrientRotationToMovement = true;
 		ShowReticleWidget(false);
