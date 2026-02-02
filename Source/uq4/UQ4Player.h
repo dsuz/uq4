@@ -91,5 +91,6 @@ private:
 	void SwitchAiming(EPlayerState NewState);
 	// 照準の表示/非表示を切り替える
 	void ShowReticleWidget(bool bShow);
-	void ActivateRagdoll();
+	void ActivateRagdoll1();
+	void ActivateRagdoll2();
 };

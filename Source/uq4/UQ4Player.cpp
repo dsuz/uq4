@@ -4,11 +4,12 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Components/CapsuleComponent.h"
 
 AUQ4Player::AUQ4Player()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	
+
 	// Set skeletal mesh
 	auto SkeletalMesh = ConstructorHelpers::FObjectFinder<USkeletalMesh>(
 		TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequin_UE4/Meshes/SK_Mannequin.SK_Mannequin'")).Object;
@@ -18,7 +19,7 @@ AUQ4Player::AUQ4Player()
 		GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -85.f));
 		GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 	}
-	
+
 	// Setup Gun
 	GunMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Gun"));
 	auto GunMesh = ConstructorHelpers::FObjectFinder<UStaticMesh>(
@@ -37,7 +38,7 @@ AUQ4Player::AUQ4Player()
 			Muzzle->SetRelativeRotation(FRotator(0, 90, 0));
 		}
 	}
-	
+
 	// Camera setup
 	GameplayCameraComponent = CreateDefaultSubobject<UGameplayCameraComponent>("Camera");
 	GameplayCameraComponent->SetupAttachment(RootComponent);
@@ -46,10 +47,11 @@ AUQ4Player::AUQ4Player()
 void AUQ4Player::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 	{
-		if (auto* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		if (auto* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
+			PlayerController->GetLocalPlayer()))
 		{
 			if (DefaultMappingContext)
 			{
@@ -71,7 +73,7 @@ float AUQ4Player::TakeDamage(float Damage, const FDamageEvent& DamageEvent, ACon
 void AUQ4Player::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+
 	if (bForceMoveForward)
 	{
 		AddMovementInput(GetActorForwardVector(), SlidingSpeed * DeltaTime, true);
@@ -113,27 +115,28 @@ void AUQ4Player::Shoot()
 
 void AUQ4Player::StartSliding()
 {
-	if (GetCharacterMovement()->MaxWalkSpeed == SlidingSpeed) return;	// スライディングしている間はこの操作を無効にする
+	if (GetCharacterMovement()->MaxWalkSpeed == SlidingSpeed) return; // スライディングしている間はこの操作を無効にする
 	// スライディングしている間は制御不能にする
 	bForceMoveForward = true;
 	auto OriginalWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
 	GetCharacterMovement()->MaxWalkSpeed = SlidingSpeed;
 	TObjectPtr<APlayerController> PlayerController = Cast<APlayerController>(GetController());
 	//if (PlayerController)
-		//DisableInput(PlayerController);	// スライディングしている間も少し制御できた方が面白いので、制御を無効にしない
+	//DisableInput(PlayerController);	// スライディングしている間も少し制御できた方が面白いので、制御を無効にしない
 	auto AnimInstance = GetMesh()->GetAnimInstance();
-	
+
 	if (SlidingAnimMontage && AnimInstance)
 	{
 		AnimInstance->Montage_Play(SlidingAnimMontage);
 		// Anim Montage の再生が終了した時の処理はラムダ式の匿名関数を作ってバインドする
 		auto MontageEndDelegate = AnimInstance->Montage_GetEndedDelegate(SlidingAnimMontage);
-		MontageEndDelegate->BindWeakLambda(this, [this, PlayerController, OriginalWalkSpeed](UAnimMontage* FRepRootMotionMontage, bool bInterrupted)
-		{
-			bForceMoveForward = false;
-			GetCharacterMovement()->MaxWalkSpeed = OriginalWalkSpeed;
-			//EnableInput(PlayerController);
-		});
+		MontageEndDelegate->BindWeakLambda(
+			this, [this, PlayerController, OriginalWalkSpeed](UAnimMontage* FRepRootMotionMontage, bool bInterrupted)
+			{
+				bForceMoveForward = false;
+				GetCharacterMovement()->MaxWalkSpeed = OriginalWalkSpeed;
+				//EnableInput(PlayerController);
+			});
 	}
 	else
 	{
@@ -176,15 +179,17 @@ void AUQ4Player::ShootProjectile()
 	else if (State == EPlayerState::Aim)
 	{
 		ProjectileRotation = CameraManager->GetCameraRotation();
-	}	// Aim モードで Ray が当たらなかったら、カメラが向いている方向に弾を飛ばす
+	} // Aim モードで Ray が当たらなかったら、カメラが向いている方向に弾を飛ばす
 
 	FActorSpawnParameters SpawnInfo;
-	GetWorld()->SpawnActor<AActor>(ProjectileClass.Get(), Muzzle->GetComponentLocation(), ProjectileRotation, SpawnInfo);
+	GetWorld()->SpawnActor<AActor>(ProjectileClass.Get(), Muzzle->GetComponentLocation(), ProjectileRotation,
+	                               SpawnInfo);
 }
 
 void AUQ4Player::Die()
 {
-	ActivateRagdoll();
+	//ActivateRagdoll1();
+	ActivateRagdoll2();
 }
 
 void AUQ4Player::Look(const FVector2D Value)
@@ -255,32 +260,59 @@ void AUQ4Player::ShowReticleWidget(bool bShow)
 	} // インスタンス化してない状態で呼ばれた場合は、それをする
 }
 
-void AUQ4Player::ActivateRagdoll()
+void AUQ4Player::ActivateRagdoll1()
 {
 	if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
 	{
 		MoveComp->DisableMovement();
 	}
- 
+
 	// Disable player input
 	if (APlayerController* PC = Cast<APlayerController>(GetController()))
 	{
 		DisableInput(PC);
 	}
- 
+
 	// Detach controller (optional)
 	DetachFromControllerPendingDestroy();
- 
+
 	// Set collision profile for ragdoll
 	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
- 
+
 	// Enable physics simulation on all bones
 	GetMesh()->SetAllBodiesSimulatePhysics(true);
 	GetMesh()->WakeAllRigidBodies();
 	GetMesh()->bBlendPhysics = true;
- 
+
 	// Detach Gun
 	GunMeshComp->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 	GunMeshComp->SetSimulatePhysics(true);
 	//GetMesh()->SetCollisionProfileName(TEXT("PhysicsActor"));
+}
+
+void AUQ4Player::ActivateRagdoll2()
+{
+	USkeletalMeshComponent* MeshComp = GetMesh();
+	if (!MeshComp || !MeshComp->GetPhysicsAsset())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SkeletalMesh or PhysicsAsset missing!"));
+		return;
+	}
+
+	// Disable character movement and controller possession 
+	GetCharacterMovement()->DisableMovement();
+	DetachFromControllerPendingDestroy();
+
+	// Enable physics simulation on all bodies to start ragdoll
+	MeshComp->SetAllBodiesSimulatePhysics(true);
+	MeshComp->SetSimulatePhysics(true);
+	MeshComp->WakeAllRigidBodies();
+
+	// Set collision profile, disable capsule collision for free physics movement
+	MeshComp->SetCollisionProfileName(TEXT("Ragdoll"));
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	// Detach Gun
+	GunMeshComp->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+	GunMeshComp->SetSimulatePhysics(true);
 }
