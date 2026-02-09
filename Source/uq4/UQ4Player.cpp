@@ -42,9 +42,6 @@ AUQ4Player::AUQ4Player()
 	// Camera setup
 	GameplayCameraComponent = CreateDefaultSubobject<UGameplayCameraComponent>("Camera");
 	GameplayCameraComponent->SetupAttachment(RootComponent);
-	
-	// State Machine
-	StateMachine = CreateDefaultSubobject<UStateMachineComponent>(TEXT("StateMachine"));
 }
 
 void AUQ4Player::BeginPlay()

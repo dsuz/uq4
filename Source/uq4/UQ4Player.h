@@ -4,9 +4,7 @@
 #include "Enums.h"
 #include "GameFramework/Character.h"
 #include "EnhancedInputSubsystems.h"
-#include "Components/StateMachineComponent.h"
 #include "GameFramework/GameplayCameraComponent.h"
-//#include "StateMachineSystem."
 #include "UQ4Player.generated.h"
 
 UCLASS()
@@ -25,8 +23,6 @@ protected:
 	// Move Character function
 	UFUNCTION(BlueprintCallable)
 	void Move(const FVector2D Value);
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<UStateMachineComponent> StateMachine;
 
 public:
 	virtual float TakeDamage(float Damage, const FDamageEvent& DamageEvent, AController* EventInstigator,

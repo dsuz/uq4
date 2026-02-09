@@ -2,9 +2,6 @@
 Content/NiagaraExamples
 Content/DissolveVFX
 
-# Example of StateMachineSystem
-Plugins/StateMachineSystem/Content/ExampleTemplate/*
-
 # Visual Studio 2015 user specific files
 .vs/
 
