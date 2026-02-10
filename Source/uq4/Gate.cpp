@@ -38,17 +38,17 @@ void AGate::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAct
 		UE_LOG(LogTemp, Error, TEXT("Game Mode is null"));
 		return;
 	}
-	
-	switch (GateType)
-	{
-	case EGateType::Start:
-		GameMode->StartGame();
-		break;
-	case EGateType::Goal:
-		GameMode->StopGame();
-		break;
-	default:
-		break;
-	}
 
+	GameMode->SetStateTag(TagSendToStateOnOverlap);
+	// switch (GateType)
+	// {
+	// case EGateType::Start:
+	// 	GameMode->SetStateTag(FName("Start"));
+	// 	break;
+	// case EGateType::Goal:
+	// 	GameMode->SetStateTag(FName("Goal"));
+	// 	break;
+	// default:
+	// 	break;
+	// }
 }
