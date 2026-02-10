@@ -1,7 +1,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Enums.h"
 #include "GameFramework/GameModeBase.h"
 #include "Components/StateTreeComponent.h"
 #include "ThirdPersonGameMode.generated.h"
@@ -33,15 +32,10 @@ public:
 	void ResetTimer();
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	float GetElapsedSeconds();
-	// UFUNCTION(BlueprintCallable, BlueprintPure)
-	// EGameState GetGameState();
-	// UFUNCTION(BlueprintCallable)
-	// void SetGameState(EGameState NewState);
 	UFUNCTION(BlueprintCallable)
 	void SetStateTag(FGameplayTag tag);
 	
 private:
 	float ElapsedTime = 0.0f;
 	bool bIsTimerRunning = false;
-	//EGameState GameState = EGameState::None;
 };

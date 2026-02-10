@@ -40,15 +40,4 @@ void AGate::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAct
 	}
 
 	GameMode->SetStateTag(TagSendToStateOnOverlap);
-	// switch (GateType)
-	// {
-	// case EGateType::Start:
-	// 	GameMode->SetStateTag(FName("Start"));
-	// 	break;
-	// case EGateType::Goal:
-	// 	GameMode->SetStateTag(FName("Goal"));
-	// 	break;
-	// default:
-	// 	break;
-	// }
 }
